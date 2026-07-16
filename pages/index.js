@@ -4,26 +4,33 @@ import Layout from '../components/Layout'
 import VideoCard from '../components/VideoCard'
 
 const SORT_OPTIONS = [
-  { label: '新着順', value: 'date' },
   { label: '人気順', value: 'rank' },
+  { label: '新着順', value: 'date' },
   { label: 'レビュー順', value: 'review' },
 ]
+
+const TYPE_LABELS = {
+  doujin: 'NTR同人誌',
+  manga: 'エロ漫画',
+  game: '同人ゲーム',
+}
 
 export default function Home() {
   const router = useRouter()
   const [items, setItems] = useState([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
-  const [sort, setSort] = useState('date')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  const keyword = router.query.q || '寝取られ'
-  const HITS = 24
+  const keyword = router.query.q || 'NTR 寝取られ'
+  const type = router.query.type || 'doujin'
+  const sort = router.query.sort || 'rank'
+  const HITS = 20
 
-  const fetchItems = useCallback(async (kw, pg, srt) => {
+  const fetchItems = useCallback(async (kw, pg, srt, tp) => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({ keyword: kw, page: pg, hits: HITS, sort: srt })
+      const params = new URLSearchParams({ keyword: kw, page: pg, hits: HITS, sort: srt, type: tp })
       const r = await fetch(`/api/items?${params}`)
       const data = await r.json()
       setItems(data.items || [])
@@ -37,35 +44,37 @@ export default function Home() {
   useEffect(() => {
     if (!router.isReady) return
     setPage(1)
-    fetchItems(keyword, 1, sort)
-  }, [router.isReady, keyword, sort, fetchItems])
+    fetchItems(keyword, 1, sort, type)
+  }, [router.isReady, keyword, sort, type, fetchItems])
 
-  useEffect(() => {
-    if (!router.isReady) return
-    fetchItems(keyword, page, sort)
-  }, [page]) // eslint-disable-line
+  const handlePageChange = (newPage) => {
+    setPage(newPage)
+    fetchItems(keyword, newPage, sort, type)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const totalPages = Math.ceil(total / HITS)
+  const sectionLabel = TYPE_LABELS[type] || 'NTR同人誌'
 
   return (
     <Layout>
-      <div className="hero" style={{ marginBottom: 24, marginLeft: -16, marginRight: -16, padding: '24px 16px' }}>
+      <div className="hero" style={{ margin: '-28px -16px 28px', padding: '28px 16px' }}>
         <h1>
-          <span className="red">NTR</span> 寝取られ動画まとめ
+          <span className="red">NTR</span> 同人誌・エロ漫画まとめ
         </h1>
-        <p>FANZA最新作・人気作を毎日更新 | 現在 {total.toLocaleString()} 本</p>
+        <p>寝取られ・NTR系の人気作品を厳選紹介 | {total.toLocaleString()} 作品</p>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
         <div className="section-title" style={{ margin: 0 }}>
-          {keyword !== '寝取られ' ? `「${keyword}」の検索結果` : '最新NTR動画'}
+          {keyword !== 'NTR 寝取られ' ? `「${keyword}」の検索結果` : `${sectionLabel}ランキング`}
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           {SORT_OPTIONS.map((o) => (
             <button
               key={o.value}
               className={`pill ${sort === o.value ? 'active' : ''}`}
-              onClick={() => setSort(o.value)}
+              onClick={() => router.push(`/?type=${type}&q=${encodeURIComponent(keyword)}&sort=${o.value}`)}
             >
               {o.label}
             </button>
@@ -85,19 +94,19 @@ export default function Home() {
 
           {totalPages > 1 && (
             <div className="pagination">
-              <button className="page-btn" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+              <button className="page-btn" onClick={() => handlePageChange(Math.max(1, page - 1))} disabled={page === 1}>
                 ← 前
               </button>
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 const start = Math.max(1, Math.min(page - 2, totalPages - 4))
                 const n = start + i
                 return (
-                  <button key={n} className={`page-btn ${page === n ? 'active' : ''}`} onClick={() => setPage(n)}>
+                  <button key={n} className={`page-btn ${page === n ? 'active' : ''}`} onClick={() => handlePageChange(n)}>
                     {n}
                   </button>
                 )
               })}
-              <button className="page-btn" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+              <button className="page-btn" onClick={() => handlePageChange(Math.min(totalPages, page + 1))} disabled={page === totalPages}>
                 次 →
               </button>
             </div>
