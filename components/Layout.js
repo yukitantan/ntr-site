@@ -5,11 +5,11 @@ import Head from 'next/head'
 const CATEGORIES = [
   { label: '🔥 人気総合', type: 'doujin', keyword: 'NTR 寝取られ', sort: 'rank' },
   { label: '📚 NTR同人誌', type: 'doujin', keyword: '寝取られ', sort: 'rank' },
+  { label: '📖 山文京伝特集', type: 'manga', keyword: '山文京伝', sort: 'rank' },
+  { label: '✨ 空上特集', type: 'doujin', keyword: '空上 寝取られ', sort: 'rank' },
   { label: '🎮 NTR同人ゲーム', type: 'game', keyword: '寝取られ', sort: 'rank' },
-  { label: '📖 エロ漫画', type: 'manga', keyword: '寝取られ NTR', sort: 'rank' },
   { label: '新着同人', type: 'doujin', keyword: 'NTR', sort: 'date' },
   { label: '人妻NTR', type: 'doujin', keyword: '人妻 寝取られ', sort: 'rank' },
-  { label: '異種族・モンスター', type: 'doujin', keyword: '寝取られ 異種族', sort: 'rank' },
 ]
 
 export default function Layout({ children, title, description }) {
