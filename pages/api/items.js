@@ -3,7 +3,7 @@ const FANZA_AFFILIATE_ID = process.env.FANZA_AFFILIATE_ID
 const BASE_URL = 'https://api.dmm.com/affiliate/v3/ItemList'
 
 const FLOORS = {
-  doujin: { service: 'digital', floor: 'digital_doujin' },
+  doujin: { service: 'doujin', floor: 'digital_doujin' },
   manga: { service: 'ebook', floor: 'comic' },
   game: { service: 'pcgame', floor: 'digital_pcgame' },
 }
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       date: item.date,
       price: item.prices?.price,
       review: item.review,
-      circle: item.iteminfo?.label?.[0]?.name || item.iteminfo?.maker?.[0]?.name || '',
+      circle: item.iteminfo?.maker?.[0]?.name || item.iteminfo?.label?.[0]?.name || '',
       author: item.iteminfo?.author?.map((a) => a.name) || [],
       genre: item.iteminfo?.genre?.map((g) => g.name) || [],
       type,
