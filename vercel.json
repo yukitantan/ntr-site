@@ -1,0 +1,6 @@
+{
+  "env": {
+    "FANZA_API_ID": "@fanza_api_id",
+    "FANZA_AFFILIATE_ID": "@fanza_affiliate_id"
+  }
+}
